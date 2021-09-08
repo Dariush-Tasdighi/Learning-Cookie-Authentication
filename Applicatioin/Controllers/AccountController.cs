@@ -28,10 +28,6 @@ namespace Applicatioin.Controllers
 			System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult>
 			Login(ViewModels.Account.LoginViewModel viewModel)
 		{
-			//ModelState.AddModelError(key: null, errorMessage: "Some Error Message!"); // Error!
-			//ModelState.AddModelError(key: "", errorMessage: "Some Error Message!");
-			//ModelState.AddModelError(key: string.Empty, errorMessage: "Some Error Message!");
-
 			if (ModelState.IsValid)
 			{
 				// **************************************************
@@ -114,16 +110,18 @@ namespace Applicatioin.Controllers
 					// Refreshing the authentication session should be allowed.
 					AllowRefresh = true,
 
-					// The time at which the authentication ticket expires.
-					// A value set here overrides the ExpireTimeSpan option of
-					// CookieAuthenticationOptions set with AddCookie.
-					ExpiresUtc = System.DateTimeOffset.UtcNow.AddMinutes(10),
-
 					// Whether the authentication session is persisted across
 					// multiple requests. When used with cookies, controls
 					// whether the cookie's lifetime is absolute (matching the
 					// lifetime of the authentication ticket) or session-based.
-					IsPersistent = viewModel.RememberMe,
+					IsPersistent =
+						viewModel.RememberMe,
+
+					// The time at which the authentication ticket expires.
+					// A value set here overrides the ExpireTimeSpan option of
+					// CookieAuthenticationOptions set with AddCookie.
+					ExpiresUtc =
+						viewModel.RememberMe ? System.DateTimeOffset.UtcNow.AddMinutes(20) : null,
 
 					// The time at which the authentication ticket was issued.
 					IssuedUtc = System.DateTimeOffset.UtcNow,
