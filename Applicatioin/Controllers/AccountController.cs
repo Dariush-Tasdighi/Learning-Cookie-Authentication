@@ -4,9 +4,12 @@ namespace Applicatioin.Controllers
 {
 	public class AccountController : Microsoft.AspNetCore.Mvc.Controller
 	{
-		public AccountController() : base()
+		public AccountController(Services.IUserService userService) : base()
 		{
+			UserService = userService;
 		}
+
+		public Services.IUserService UserService { get; }
 
 		[Microsoft.AspNetCore.Mvc.HttpGet]
 		[Microsoft.AspNetCore.Authorization.AllowAnonymous]
@@ -28,74 +31,64 @@ namespace Applicatioin.Controllers
 			System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult>
 			Login(ViewModels.Account.LoginViewModel viewModel)
 		{
-			//ModelState.AddModelError(key: null, errorMessage: "Some Error Message!"); // Error!
-			//ModelState.AddModelError(key: "", errorMessage: "Some Error Message!");
-			//ModelState.AddModelError(key: string.Empty, errorMessage: "Some Error Message!");
-
 			if (ModelState.IsValid)
 			{
+				// **************************************************
+				var foundedUser =
+					UserService.GetUserByUsername(username: viewModel.Username);
+
+				if (foundedUser == null)
+				{
+					//ModelState.AddModelError(key: null, errorMessage: "Invalid Username and/or Password!"); // Error!
+					//ModelState.AddModelError(key: "", errorMessage: "Invalid Username and/or Password!");
+					ModelState.AddModelError
+						(key: string.Empty, errorMessage: "Invalid Username and/or Password!");
+
+					return View(model: viewModel);
+				}
+
+				if (foundedUser.Password != viewModel.Password)
+				{
+					ModelState.AddModelError
+						(key: string.Empty, errorMessage: "Invalid Username and/or Password!");
+
+					return View(model: viewModel);
+				}
+
+				if (foundedUser.IsActive == false)
+				{
+					ModelState.AddModelError
+						(key: string.Empty, errorMessage: "Your account is disabled!");
+
+					return View(model: viewModel);
+				}
+				// **************************************************
+
 				// **************************************************
 				// **************************************************
 				// **************************************************
 				var claims =
-					new System.Collections.Generic.List<System.Security.Claims.Claim>();
+					new System.Collections.Generic
+					.List<System.Security.Claims.Claim>();
 
 				System.Security.Claims.Claim claim;
 
 				// **************************************************
 				claim = new System.Security.Claims.Claim
-					(type: System.Security.Claims.ClaimTypes.Name, value: viewModel.Username);
+					(type: System.Security.Claims.ClaimTypes.Name, value: foundedUser.Username);
 
 				claims.Add(item: claim);
 				// **************************************************
 
 				// **************************************************
-				switch (viewModel.Username.ToUpper())
+				if (foundedUser.Roles != null)
 				{
-					case "DARIUSH":
+					foreach (var role in foundedUser.Roles)
 					{
 						claim = new System.Security.Claims.Claim
-							(type: System.Security.Claims.ClaimTypes.Role, value: "Manager");
+							(type: System.Security.Claims.ClaimTypes.Role, value: role);
 
 						claims.Add(item: claim);
-
-						break;
-					}
-
-					case "ADMIN":
-					{
-						claim = new System.Security.Claims.Claim
-							(type: System.Security.Claims.ClaimTypes.Role, value: "Administrator");
-
-						claims.Add(item: claim);
-
-						break;
-					}
-
-					case "MOHSEN":
-					{
-						claim = new System.Security.Claims.Claim
-							(type: System.Security.Claims.ClaimTypes.Role, value: "Manager");
-
-						claims.Add(item: claim);
-
-						claim = new System.Security.Claims.Claim
-							(type: System.Security.Claims.ClaimTypes.Role, value: "Administrator");
-
-						claims.Add(item: claim);
-
-						break;
-					}
-
-					case "MOHAMMAD":
-					{
-						// نکته: دقت کنید که مدل ذیل کار نمی‌کند
-						claim = new System.Security.Claims.Claim
-							(type: System.Security.Claims.ClaimTypes.Role, value: "Administrator, Manager");
-
-						claims.Add(item: claim);
-
-						break;
 					}
 				}
 				// **************************************************
@@ -114,16 +107,18 @@ namespace Applicatioin.Controllers
 					// Refreshing the authentication session should be allowed.
 					AllowRefresh = true,
 
-					// The time at which the authentication ticket expires.
-					// A value set here overrides the ExpireTimeSpan option of
-					// CookieAuthenticationOptions set with AddCookie.
-					ExpiresUtc = System.DateTimeOffset.UtcNow.AddMinutes(10),
-
 					// Whether the authentication session is persisted across
 					// multiple requests. When used with cookies, controls
 					// whether the cookie's lifetime is absolute (matching the
 					// lifetime of the authentication ticket) or session-based.
-					IsPersistent = viewModel.RememberMe,
+					IsPersistent =
+						viewModel.RememberMe,
+
+					// The time at which the authentication ticket expires.
+					// A value set here overrides the ExpireTimeSpan option of
+					// CookieAuthenticationOptions set with AddCookie.
+					ExpiresUtc =
+						viewModel.RememberMe ? System.DateTimeOffset.UtcNow.AddMinutes(20) : null,
 
 					// The time at which the authentication ticket was issued.
 					IssuedUtc = System.DateTimeOffset.UtcNow,
@@ -208,6 +203,15 @@ namespace Applicatioin.Controllers
 
 			return RedirectToAction
 				(controllerName: "Account", actionName: "Login");
+		}
+
+		[Microsoft.AspNetCore.Authorization.Authorize(Roles = "Administrator")]
+		public Microsoft.AspNetCore.Mvc.RedirectToActionResult DisableUser02()
+		{
+			UserService.DisableUser(username: "User02");
+
+			return RedirectToAction
+				(controllerName: "Home", actionName: "Index");
 		}
 	}
 }

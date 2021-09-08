@@ -21,6 +21,14 @@ namespace Applicatioin
 			services.AddControllersWithViews();
 
 			// **************************************************
+			services.AddTransient
+				<Services.IUserService, Services.UserService>();
+
+			services.AddTransient
+				(serviceType: typeof(Utility.CustomCookieAuthenticationEvents));
+			// **************************************************
+
+			// **************************************************
 			services.Configure<Microsoft.AspNetCore.Builder.CookiePolicyOptions>(options =>
 			{
 				options.MinimumSameSitePolicy =
@@ -66,22 +74,24 @@ namespace Applicatioin
 					options.AccessDeniedPath =
 						new Microsoft.AspNetCore.Http.PathString(value: "/Account/AccessDenied");
 
+					options.EventsType =
+						typeof(Utility.CustomCookieAuthenticationEvents);
+
 					var value01 = options.Cookie;
 					var value02 = options.CookieManager;
 					var value03 = options.DataProtectionProvider;
 
-					var value04 = options.EventsType;
-					var value05 = options.SessionStore;
-					var value06 = options.TicketDataFormat;
+					var value04 = options.SessionStore;
+					var value05 = options.TicketDataFormat;
 
-					var value07 = options.ForwardForbid;
-					var value08 = options.ForwardSignIn;
-					var value09 = options.ForwardSignOut;
-					var value10 = options.ForwardChallenge;
-					var value11 = options.ForwardAuthenticate;
-					var value12 = options.ForwardDefaultSelector;
+					var value06 = options.ForwardForbid;
+					var value07 = options.ForwardSignIn;
+					var value08 = options.ForwardSignOut;
+					var value09 = options.ForwardChallenge;
+					var value10 = options.ForwardAuthenticate;
+					var value11 = options.ForwardDefaultSelector;
 
-					options.Validate();
+					//options.Validate();
 				});
 			// **************************************************
 		}
