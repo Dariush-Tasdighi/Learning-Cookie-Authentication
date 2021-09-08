@@ -1,0 +1,50 @@
+﻿@{
+	ViewData["Title"] = "User Profile";
+}
+
+<h1>
+	User Profile
+</h1>
+
+<h3>
+	Name: @(Context.User.Identity.Name)
+</h3>
+
+<hr />
+
+<h5>
+	Claims
+</h5>
+
+<div class="row">
+	<div class="col">
+		<ul>
+			@foreach (var item in Context.User.Claims)
+			{
+				<li>
+					Issuer: @(item.Issuer)
+					<br />
+					Original Issuer: @(item.OriginalIssuer)
+					<br />
+					Subject Name: @(item.Subject.Name)
+					<br />
+					Subject Label: @(item.Subject.Label)
+					<br />
+					Subject Name Claim Type: @(item.Subject.NameClaimType)
+					<br />
+					Subject Is Authenticated: @(item.Subject.IsAuthenticated)
+					<br />
+					Subject Authentication Type: @(item.Subject.AuthenticationType)
+					<br />
+					Subject Role Claim Type: @(item.Subject.RoleClaimType)
+					<br />
+					Value Type: @(item.ValueType)
+					<br />
+					Type: @(item.Type)
+					<br />
+					Value: @(item.Value)
+				</li>
+			}
+		</ul>
+	</div>
+</div>
