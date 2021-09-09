@@ -24,7 +24,7 @@ namespace Applicatioin.Services
 					user =
 						new Models.User
 						{
-							IsActive = false,
+							IsActive = true,
 							Username = "User01",
 							Password = "1234512345",
 
@@ -42,7 +42,7 @@ namespace Applicatioin.Services
 							Username = "User02",
 							Password = "1234512345",
 
-							Roles = null,
+							Roles = new string[] { "Manager" },
 						};
 
 					_users.Add(user);
@@ -56,7 +56,7 @@ namespace Applicatioin.Services
 							Username = "User03",
 							Password = "1234512345",
 
-							Roles = new string[] { "Manager" },
+							Roles = new string[] { "Administrator" },
 						};
 
 					_users.Add(user);
@@ -70,7 +70,7 @@ namespace Applicatioin.Services
 							Username = "User04",
 							Password = "1234512345",
 
-							Roles = new string[] { "Administrator" },
+							Roles = new string[] { "Manager", "Administrator" },
 						};
 
 					_users.Add(user);
@@ -80,11 +80,11 @@ namespace Applicatioin.Services
 					user =
 						new Models.User
 						{
-							IsActive = true,
-							Username = "User05",
+							IsActive = false,
+							Username = "User04",
 							Password = "1234512345",
 
-							Roles = new string[] { "Manager", "Administrator" },
+							Roles = null,
 						};
 
 					_users.Add(user);
