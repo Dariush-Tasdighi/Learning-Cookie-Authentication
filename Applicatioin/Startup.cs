@@ -57,9 +57,11 @@ namespace Applicatioin
 				Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
 				.AddCookie(options =>
 				{
-					options.ClaimsIssuer = "DTAT Security Framework"; // Default: null
+					options.ClaimsIssuer =
+						"DTAT Security Framework"; // Default: null
 
 					options.SlidingExpiration = true; // Default: true
+
 					options.ExpireTimeSpan =
 						new System.TimeSpan(hours: 0, minutes: 20, seconds: 0); // Default: 14 Days
 

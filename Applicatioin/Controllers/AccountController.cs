@@ -39,8 +39,6 @@ namespace Applicatioin.Controllers
 
 				if (foundedUser == null)
 				{
-					//ModelState.AddModelError(key: null, errorMessage: "Invalid Username and/or Password!"); // Error!
-					//ModelState.AddModelError(key: "", errorMessage: "Invalid Username and/or Password!");
 					ModelState.AddModelError
 						(key: string.Empty, errorMessage: "Invalid Username and/or Password!");
 
@@ -62,6 +60,11 @@ namespace Applicatioin.Controllers
 
 					return View(model: viewModel);
 				}
+
+				string lastSessionId =
+					System.Guid.NewGuid().ToString();
+
+				foundedUser.LastSessionId = lastSessionId;
 				// **************************************************
 
 				// **************************************************
@@ -76,6 +79,13 @@ namespace Applicatioin.Controllers
 				// **************************************************
 				claim = new System.Security.Claims.Claim
 					(type: System.Security.Claims.ClaimTypes.Name, value: foundedUser.Username);
+
+				claims.Add(item: claim);
+				// **************************************************
+
+				// **************************************************
+				claim = new System.Security.Claims.Claim
+					(type: nameof(foundedUser.LastSessionId), value: lastSessionId);
 
 				claims.Add(item: claim);
 				// **************************************************

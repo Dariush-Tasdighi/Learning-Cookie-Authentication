@@ -18,38 +18,82 @@ namespace Applicatioin.Utility
 			System.Threading.Tasks.Task ValidatePrincipal
 			(Microsoft.AspNetCore.Authentication.Cookies.CookieValidatePrincipalContext context)
 		{
-			var userPrincipal = context.Principal;
+			var userPrincipal =
+				context.Principal;
 
-			var foundedClaim =
+			// **************************************************
+			var foundedUsernameClaim =
 				userPrincipal.Claims
-				.Where(current => current.Type == System.Security.Claims.ClaimTypes.Name)
+				.Where(current => current.Type.ToUpper() == System.Security.Claims.ClaimTypes.Name.ToUpper())
 				.FirstOrDefault();
 
-			if (foundedClaim == null)
+			if (foundedUsernameClaim == null)
 			{
+				await RejectPrincipalAndSignOutAsync(context: context);
 				return;
 			}
 
-			if (string.IsNullOrWhiteSpace(foundedClaim.Value))
+			if (string.IsNullOrWhiteSpace(foundedUsernameClaim.Value))
 			{
+				await RejectPrincipalAndSignOutAsync(context: context);
 				return;
 			}
+			// **************************************************
 
+			// **************************************************
 			string username =
-				foundedClaim.Value;
+				foundedUsernameClaim.Value;
 
 			Models.User foundedUser =
 				UserService.GetUserByUsername(username: username);
 
 			if ((foundedUser == null) || (foundedUser.IsActive == false))
 			{
-				context.RejectPrincipal();
-
-				// using Microsoft.AspNetCore.Authentication;
-				await context.HttpContext.SignOutAsync(
-					Microsoft.AspNetCore.Authentication.Cookies
-					.CookieAuthenticationDefaults.AuthenticationScheme);
+				await RejectPrincipalAndSignOutAsync(context: context);
 			}
+			// **************************************************
+
+			// **************************************************
+			if (string.IsNullOrWhiteSpace(foundedUser.LastSessionId))
+			{
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
+			}
+
+			var foundedLastSessionIdClaim =
+				userPrincipal.Claims
+				.Where(current => current.Type.ToUpper() == nameof(foundedUser.LastSessionId).ToUpper())
+				.FirstOrDefault();
+
+			if (foundedLastSessionIdClaim == null)
+			{
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
+			}
+
+			if (string.IsNullOrWhiteSpace(foundedLastSessionIdClaim.Value))
+			{
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
+			}
+
+			if (foundedLastSessionIdClaim.Value.ToUpper() != foundedUser.LastSessionId.ToUpper())
+			{
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
+			}
+			// **************************************************
+		}
+
+		public async System.Threading.Tasks.Task RejectPrincipalAndSignOutAsync
+			(Microsoft.AspNetCore.Authentication.Cookies.CookieValidatePrincipalContext context)
+		{
+			context.RejectPrincipal();
+
+			// using Microsoft.AspNetCore.Authentication;
+			await context.HttpContext.SignOutAsync
+				(Microsoft.AspNetCore.Authentication.Cookies
+				.CookieAuthenticationDefaults.AuthenticationScheme);
 		}
 	}
 }

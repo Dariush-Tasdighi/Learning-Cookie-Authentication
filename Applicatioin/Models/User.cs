@@ -13,5 +13,7 @@
 		public string Password { get; set; }
 
 		public string[] Roles { get; set; }
+
+		public string LastSessionId { get; set; }
 	}
 }
