@@ -48,7 +48,12 @@ namespace Applicatioin.Controllers
 				// **************************************************
 				switch (viewModel.Username.ToUpper())
 				{
-					case "DARIUSH":
+					case "USER01":
+					{
+						break;
+					}
+
+					case "USER02":
 					{
 						claim = new System.Security.Claims.Claim
 							(type: System.Security.Claims.ClaimTypes.Role, value: "Manager");
@@ -58,7 +63,7 @@ namespace Applicatioin.Controllers
 						break;
 					}
 
-					case "ADMIN":
+					case "USER03":
 					{
 						claim = new System.Security.Claims.Claim
 							(type: System.Security.Claims.ClaimTypes.Role, value: "Administrator");
@@ -68,7 +73,7 @@ namespace Applicatioin.Controllers
 						break;
 					}
 
-					case "MOHSEN":
+					case "USER04":
 					{
 						claim = new System.Security.Claims.Claim
 							(type: System.Security.Claims.ClaimTypes.Role, value: "Manager");
@@ -83,7 +88,7 @@ namespace Applicatioin.Controllers
 						break;
 					}
 
-					case "MOHAMMAD":
+					case "USER05":
 					{
 						// نکته: دقت کنید که مدل ذیل کار نمی‌کند
 						claim = new System.Security.Claims.Claim
@@ -92,6 +97,11 @@ namespace Applicatioin.Controllers
 						claims.Add(item: claim);
 
 						break;
+					}
+
+					default:
+					{
+						return View(model: viewModel);
 					}
 				}
 				// **************************************************
