@@ -18,7 +18,9 @@ namespace Applicatioin
 		public void ConfigureServices
 			(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
 		{
+			// **************************************************
 			services.AddControllersWithViews();
+			// **************************************************
 
 			// **************************************************
 			services.AddTransient
@@ -102,16 +104,24 @@ namespace Applicatioin
 			(Microsoft.AspNetCore.Builder.IApplicationBuilder app,
 			Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
 		{
+			// **************************************************
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
 			}
+			// **************************************************
 
+			// **************************************************
 			app.UseHttpsRedirection();
+			// **************************************************
 
+			// **************************************************
 			app.UseStaticFiles();
+			// **************************************************
 
+			// **************************************************
 			app.UseRouting();
+			// **************************************************
 
 			// **************************************************
 			app.UseCookiePolicy();
@@ -121,12 +131,14 @@ namespace Applicatioin
 			app.UseAuthorization();
 			// **************************************************
 
+			// **************************************************
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllerRoute(
 					name: "default",
 					pattern: "{controller=Home}/{action=Index}/{id?}");
 			});
+			// **************************************************
 		}
 	}
 }
