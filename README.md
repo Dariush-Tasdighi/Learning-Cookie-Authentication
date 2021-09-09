@@ -32,7 +32,7 @@ Just cookie authentication and authorization with (In this step, user passwords 
 	* User02 (Active) (Roles: Manager)
 	* User03 (Active) (Roles: Administrator)
 	* User04 (Active) (Roles: Manager, Administrator)
-	* User05 (Active)
+	* User05 (Inactive)
 
 Administrators can disable User02 (By menu item)
 After some administrator disable User02, the user (User02) can not work with the site and should login again!
