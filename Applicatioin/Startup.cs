@@ -24,7 +24,7 @@ namespace Applicatioin
 			services.AddTransient
 				<Services.IUserService, Services.UserService>();
 
-			services.AddTransient
+			services.AddScoped
 				(serviceType: typeof(Utility.CustomCookieAuthenticationEvents));
 			// **************************************************
 
