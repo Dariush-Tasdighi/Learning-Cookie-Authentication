@@ -14,6 +14,9 @@
 
 		public string[] Roles { get; set; }
 
+		/// <summary>
+		/// New in this Branch!
+		/// </summary>
 		public string LastSessionId { get; set; }
 	}
 }

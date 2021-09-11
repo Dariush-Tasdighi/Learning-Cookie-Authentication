@@ -2,18 +2,26 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-//using Microsoft.AspNetCore.DataProtection;
-
 namespace Applicatioin
 {
 	public class Startup : object
 	{
-		public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration)
+		#region Constants
+		public const string AllowAllOrigins = "AllowAllOrigins";
+
+		//public const string AuthenticationScheme =
+		//	Microsoft.AspNetCore.Authentication.Cookies
+		//	.CookieAuthenticationDefaults.AuthenticationScheme;
+		public const string AuthenticationScheme = "Identity.Application";
+		#endregion /Constants
+
+		public Startup
+			(Microsoft.Extensions.Configuration.IConfiguration configuration)
 		{
 			Configuration = configuration;
 		}
 
-		public Microsoft.Extensions.Configuration.IConfiguration Configuration { get; }
+		protected Microsoft.Extensions.Configuration.IConfiguration Configuration { get; }
 
 		public void ConfigureServices
 			(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
@@ -26,8 +34,8 @@ namespace Applicatioin
 			services.AddTransient
 				<Services.IUserService, Services.UserService>();
 
-			services.AddScoped
-				(serviceType: typeof(Utility.CustomCookieAuthenticationEvents));
+			services.AddScoped(serviceType:
+				typeof(Utility.CustomCookieAuthenticationEvents));
 			// **************************************************
 
 			// **************************************************
@@ -42,7 +50,7 @@ namespace Applicatioin
 				options.Secure =
 					Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
 
-				//options.ConsentCookie = 
+				//options.ConsentCookie =
 
 				// This lambda determines whether user consent for
 				// non-essential cookies is needed for a given request.
@@ -55,48 +63,61 @@ namespace Applicatioin
 
 			// **************************************************
 			// using Microsoft.Extensions.DependencyInjection;
-			services.AddAuthentication(defaultScheme:
-				Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
-				.AddCookie(options =>
+			services
+				.AddAuthentication(current =>
 				{
-					options.ClaimsIssuer =
-						"DTAT Security Framework"; // Default: null
+					current.DefaultScheme = AuthenticationScheme;
+					current.DefaultSignInScheme = AuthenticationScheme;
+					current.DefaultForbidScheme = AuthenticationScheme;
+					current.DefaultSignOutScheme = AuthenticationScheme;
+					current.DefaultChallengeScheme = AuthenticationScheme;
+					current.DefaultAuthenticateScheme = AuthenticationScheme;
 
-					options.SlidingExpiration = true; // Default: true
+					//current.Schemes
+					//current.SchemeMap
+					current.RequireAuthenticatedSignIn = true;
+				})
+				.AddCookie(authenticationScheme: AuthenticationScheme,
+					options =>
+					{
+						options.ClaimsIssuer =
+							"DTAT Security Framework"; // Default: null
 
-					options.ExpireTimeSpan =
-						new System.TimeSpan(hours: 0, minutes: 20, seconds: 0); // Default: 14 Days
+						options.SlidingExpiration = true; // Default: true
 
-					options.ReturnUrlParameter = "ReturnUrl"; // Default: "ReturnUrl"
+						options.ExpireTimeSpan =
+							new System.TimeSpan(hours: 0, minutes: 20, seconds: 0); // Default: 14 Days
 
-					options.LoginPath =
-						new Microsoft.AspNetCore.Http.PathString(value: "/Account/Login");
+						options.ReturnUrlParameter = "ReturnUrl"; // Default: "ReturnUrl"
 
-					options.LogoutPath =
-						new Microsoft.AspNetCore.Http.PathString(value: "/Account/Logout");
+						options.LoginPath =
+							new Microsoft.AspNetCore.Http.PathString(value: "/Account/Login");
 
-					options.AccessDeniedPath =
-						new Microsoft.AspNetCore.Http.PathString(value: "/Account/AccessDenied");
+						options.LogoutPath =
+							new Microsoft.AspNetCore.Http.PathString(value: "/Account/Logout");
 
-					options.EventsType =
-						typeof(Utility.CustomCookieAuthenticationEvents);
+						options.AccessDeniedPath =
+							new Microsoft.AspNetCore.Http.PathString(value: "/Account/AccessDenied");
 
-					var value01 = options.Cookie;
-					var value02 = options.CookieManager;
-					var value03 = options.DataProtectionProvider;
+						options.EventsType =
+							typeof(Utility.CustomCookieAuthenticationEvents);
 
-					var value04 = options.SessionStore;
-					var value05 = options.TicketDataFormat;
+						var value01 = options.Cookie;
+						var value02 = options.CookieManager;
+						var value03 = options.DataProtectionProvider;
 
-					var value06 = options.ForwardForbid;
-					var value07 = options.ForwardSignIn;
-					var value08 = options.ForwardSignOut;
-					var value09 = options.ForwardChallenge;
-					var value10 = options.ForwardAuthenticate;
-					var value11 = options.ForwardDefaultSelector;
+						var value04 = options.SessionStore;
+						var value05 = options.TicketDataFormat;
 
-					//options.Validate();
-				});
+						var value06 = options.ForwardForbid;
+						var value07 = options.ForwardSignIn;
+						var value08 = options.ForwardSignOut;
+						var value09 = options.ForwardChallenge;
+						var value10 = options.ForwardAuthenticate;
+						var value11 = options.ForwardDefaultSelector;
+
+						options.Validate();
+					});
 			// **************************************************
 		}
 
@@ -113,13 +134,9 @@ namespace Applicatioin
 
 			// **************************************************
 			app.UseHttpsRedirection();
-			// **************************************************
 
-			// **************************************************
 			app.UseStaticFiles();
-			// **************************************************
 
-			// **************************************************
 			app.UseRouting();
 			// **************************************************
 

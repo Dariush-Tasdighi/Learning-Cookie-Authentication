@@ -18,13 +18,22 @@ namespace Applicatioin.Utility
 			System.Threading.Tasks.Task ValidatePrincipal
 			(Microsoft.AspNetCore.Authentication.Cookies.CookieValidatePrincipalContext context)
 		{
+			// **************************************************
+			if (context.Principal == null)
+			{
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
+			}
+			// **************************************************
+
 			var userPrincipal =
 				context.Principal;
 
 			// **************************************************
 			var foundedUsernameClaim =
 				userPrincipal.Claims
-				.Where(current => current.Type.ToUpper() == System.Security.Claims.ClaimTypes.Name.ToUpper())
+				.Where(current => current.Type.ToUpper() ==
+					System.Security.Claims.ClaimTypes.Name.ToUpper())
 				.FirstOrDefault();
 
 			if (foundedUsernameClaim == null)
@@ -47,9 +56,16 @@ namespace Applicatioin.Utility
 			Models.User foundedUser =
 				UserService.GetUserByUsername(username: username);
 
-			if ((foundedUser == null) || (foundedUser.IsActive == false))
+			if (foundedUser == null)
 			{
 				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
+			}
+
+			if (foundedUser.IsActive == false)
+			{
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
 			}
 			// **************************************************
 
@@ -92,8 +108,7 @@ namespace Applicatioin.Utility
 
 			// using Microsoft.AspNetCore.Authentication;
 			await context.HttpContext.SignOutAsync
-				(Microsoft.AspNetCore.Authentication.Cookies
-				.CookieAuthenticationDefaults.AuthenticationScheme);
+				(scheme: Applicatioin.Startup.AuthenticationScheme);
 		}
 	}
 }
