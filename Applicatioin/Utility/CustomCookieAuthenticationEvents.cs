@@ -1,55 +1,83 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Authentication;
 
-namespace Applicatioin.Utility
+namespace Utility
 {
 	public class CustomCookieAuthenticationEvents :
 		Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
 	{
-		public CustomCookieAuthenticationEvents(Services.IUserService userService)
+		public CustomCookieAuthenticationEvents(Applicatioin.Services.IUserService userService)
 		{
 			UserService = userService;
 		}
 
-		public Services.IUserService UserService { get; set; }
+		public Applicatioin.Services.IUserService UserService { get; set; }
 
 		public override
 			async
 			System.Threading.Tasks.Task ValidatePrincipal
 			(Microsoft.AspNetCore.Authentication.Cookies.CookieValidatePrincipalContext context)
 		{
-			var userPrincipal = context.Principal;
+			// **************************************************
+			if (context.Principal == null)
+			{
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
+			}
+			// **************************************************
 
-			var foundedClaim =
+			var userPrincipal =
+				context.Principal;
+
+			// **************************************************
+			var foundedUsernameClaim =
 				userPrincipal.Claims
-				.Where(current => current.Type == System.Security.Claims.ClaimTypes.Name)
+				.Where(current => current.Type.ToUpper() ==
+					System.Security.Claims.ClaimTypes.Name.ToUpper())
 				.FirstOrDefault();
 
-			if (foundedClaim == null)
+			if (foundedUsernameClaim == null)
 			{
+				await RejectPrincipalAndSignOutAsync(context: context);
 				return;
 			}
 
-			if (string.IsNullOrWhiteSpace(foundedClaim.Value))
+			if (string.IsNullOrWhiteSpace(foundedUsernameClaim.Value))
 			{
+				await RejectPrincipalAndSignOutAsync(context: context);
 				return;
 			}
+			// **************************************************
 
+			// **************************************************
 			string username =
-				foundedClaim.Value;
+				foundedUsernameClaim.Value;
 
 			Models.User foundedUser =
 				UserService.GetUserByUsername(username: username);
 
-			if ((foundedUser == null) || (foundedUser.IsActive == false))
+			if (foundedUser == null)
 			{
-				context.RejectPrincipal();
-
-				// using Microsoft.AspNetCore.Authentication;
-				await context.HttpContext.SignOutAsync(
-					Microsoft.AspNetCore.Authentication.Cookies
-					.CookieAuthenticationDefaults.AuthenticationScheme);
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
 			}
+
+			if (foundedUser.IsActive == false)
+			{
+				await RejectPrincipalAndSignOutAsync(context: context);
+				return;
+			}
+			// **************************************************
+		}
+
+		public async System.Threading.Tasks.Task RejectPrincipalAndSignOutAsync
+			(Microsoft.AspNetCore.Authentication.Cookies.CookieValidatePrincipalContext context)
+		{
+			context.RejectPrincipal();
+
+			// using Microsoft.AspNetCore.Authentication;
+			await context.HttpContext.SignOutAsync
+				(scheme: Applicatioin.Startup.AuthenticationScheme);
 		}
 	}
 }

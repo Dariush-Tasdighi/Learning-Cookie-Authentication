@@ -6,6 +6,9 @@
 		{
 		}
 
+		/// <summary>
+		/// New Feature!
+		/// </summary>
 		public bool IsActive { get; set; }
 
 		public string Username { get; set; }
