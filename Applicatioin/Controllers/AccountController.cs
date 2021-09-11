@@ -35,12 +35,14 @@ namespace Applicatioin.Controllers
 			{
 				// **************************************************
 				var foundedUser =
-					UserService.GetUserByUsername(username: viewModel.Username);
+					UserService.GetUserByUsername
+					(username: viewModel.Username);
 
 				if (foundedUser == null)
 				{
 					ModelState.AddModelError
-						(key: string.Empty, errorMessage: "Invalid Username and/or Password!");
+						(key: string.Empty, errorMessage:
+						"Invalid Username and/or Password!");
 
 					return View(model: viewModel);
 				}
@@ -48,7 +50,8 @@ namespace Applicatioin.Controllers
 				if (foundedUser.Password != viewModel.Password)
 				{
 					ModelState.AddModelError
-						(key: string.Empty, errorMessage: "Invalid Username and/or Password!");
+						(key: string.Empty, errorMessage:
+						"Invalid Username and/or Password!");
 
 					return View(model: viewModel);
 				}
@@ -56,7 +59,8 @@ namespace Applicatioin.Controllers
 				if (foundedUser.IsActive == false)
 				{
 					ModelState.AddModelError
-						(key: string.Empty, errorMessage: "Your account is disabled!");
+						(key: string.Empty,
+						errorMessage: "Your account is disabled!");
 
 					return View(model: viewModel);
 				}
@@ -77,14 +81,16 @@ namespace Applicatioin.Controllers
 				System.Security.Claims.Claim claim;
 
 				// **************************************************
-				claim = new System.Security.Claims.Claim
+				claim =
+					new System.Security.Claims.Claim
 					(type: System.Security.Claims.ClaimTypes.Name, value: foundedUser.Username);
 
 				claims.Add(item: claim);
 				// **************************************************
 
 				// **************************************************
-				claim = new System.Security.Claims.Claim
+				claim =
+					new System.Security.Claims.Claim
 					(type: nameof(foundedUser.LastSessionId), value: lastSessionId);
 
 				claims.Add(item: claim);
@@ -95,7 +101,8 @@ namespace Applicatioin.Controllers
 				{
 					foreach (var role in foundedUser.Roles)
 					{
-						claim = new System.Security.Claims.Claim
+						claim =
+							new System.Security.Claims.Claim
 							(type: System.Security.Claims.ClaimTypes.Role, value: role);
 
 						claims.Add(item: claim);
@@ -108,43 +115,43 @@ namespace Applicatioin.Controllers
 				// **************************************************
 				var claimsIdentity =
 					new System.Security.Claims.ClaimsIdentity
-						(claims: claims, authenticationType:
-						Microsoft.AspNetCore.Authentication.Cookies
-						.CookieAuthenticationDefaults.AuthenticationScheme);
+						(claims: claims, authenticationType: Startup.AuthenticationScheme);
 
-				var authenticationProperties = new AuthenticationProperties
-				{
-					// Refreshing the authentication session should be allowed.
-					AllowRefresh = true,
+				var authenticationProperties =
+					new AuthenticationProperties
+					{
+						// Refreshing the authentication session should be allowed.
+						AllowRefresh = true,
 
-					// Whether the authentication session is persisted across
-					// multiple requests. When used with cookies, controls
-					// whether the cookie's lifetime is absolute (matching the
-					// lifetime of the authentication ticket) or session-based.
-					IsPersistent =
-						viewModel.RememberMe,
+						// Whether the authentication session is persisted across
+						// multiple requests. When used with cookies, controls
+						// whether the cookie's lifetime is absolute (matching the
+						// lifetime of the authentication ticket) or session-based.
+						IsPersistent =
+							viewModel.RememberMe,
 
-					// The time at which the authentication ticket expires.
-					// A value set here overrides the ExpireTimeSpan option of
-					// CookieAuthenticationOptions set with AddCookie.
-					ExpiresUtc =
-						viewModel.RememberMe ? System.DateTimeOffset.UtcNow.AddMinutes(20) : null,
+						// The time at which the authentication ticket expires.
+						// A value set here overrides the ExpireTimeSpan option of
+						// CookieAuthenticationOptions set with AddCookie.
+						ExpiresUtc =
+							viewModel.RememberMe ? System.DateTimeOffset.UtcNow.AddMinutes(20) : null,
 
-					// The time at which the authentication ticket was issued.
-					IssuedUtc = System.DateTimeOffset.UtcNow,
+						// The time at which the authentication ticket was issued.
+						IssuedUtc =
+							System.DateTimeOffset.UtcNow,
 
-					// The full path or absolute URI to be
-					// used as an http redirect response value.
-					RedirectUri = null,
-				};
+						// The full path or absolute URI to be
+						// used as an http redirect response value.
+						RedirectUri = null,
+					};
 
 				var claimsPrincipal =
-					new System.Security.Claims.ClaimsPrincipal(identity: claimsIdentity);
+					new System.Security.Claims
+					.ClaimsPrincipal(identity: claimsIdentity);
 
 				// using Microsoft.AspNetCore.Authentication;
 				await HttpContext.SignInAsync
-					(scheme: Microsoft.AspNetCore.Authentication.Cookies
-					.CookieAuthenticationDefaults.AuthenticationScheme,
+					(scheme: Startup.AuthenticationScheme,
 					principal: claimsPrincipal, properties: authenticationProperties);
 				// **************************************************
 
@@ -204,12 +211,12 @@ namespace Applicatioin.Controllers
 		[Microsoft.AspNetCore.Authorization.AllowAnonymous]
 		public
 			async
-			System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.RedirectToActionResult> Logout()
+			System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.RedirectToActionResult>
+			Logout()
 		{
 			// using Microsoft.AspNetCore.Authentication;
 			await HttpContext.SignOutAsync
-				(scheme: Microsoft.AspNetCore.Authentication.Cookies
-				.CookieAuthenticationDefaults.AuthenticationScheme);
+				(scheme: Startup.AuthenticationScheme);
 
 			return RedirectToAction
 				(controllerName: "Account", actionName: "Login");
