@@ -2,12 +2,19 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-//using Microsoft.AspNetCore.DataProtection;
-
 namespace Applicatioin
 {
 	public class Startup : object
 	{
+		#region Constants
+		public const string AllowAllOrigins = "AllowAllOrigins";
+
+		//public const string AuthenticationScheme =
+		//	Microsoft.AspNetCore.Authentication.Cookies
+		//	.CookieAuthenticationDefaults.AuthenticationScheme;
+		public const string AuthenticationScheme = "Identity.Application";
+		#endregion /Constants
+
 		public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration)
 		{
 			Configuration = configuration;
@@ -32,7 +39,7 @@ namespace Applicatioin
 				options.Secure =
 					Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
 
-				//options.ConsentCookie = 
+				//options.ConsentCookie =
 
 				// This lambda determines whether user consent for
 				// non-essential cookies is needed for a given request.
@@ -45,44 +52,57 @@ namespace Applicatioin
 
 			// **************************************************
 			// using Microsoft.Extensions.DependencyInjection;
-			services.AddAuthentication(defaultScheme:
-				Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
-				.AddCookie(options =>
+			services
+				.AddAuthentication(current =>
 				{
-					options.ClaimsIssuer = "DTAT Security Framework"; // Default: null
+					current.DefaultScheme = AuthenticationScheme;
+					current.DefaultSignInScheme = AuthenticationScheme;
+					current.DefaultForbidScheme = AuthenticationScheme;
+					current.DefaultSignOutScheme = AuthenticationScheme;
+					current.DefaultChallengeScheme = AuthenticationScheme;
+					current.DefaultAuthenticateScheme = AuthenticationScheme;
 
-					options.SlidingExpiration = true; // Default: true
-					options.ExpireTimeSpan =
-						new System.TimeSpan(hours: 0, minutes: 20, seconds: 0); // Default: 14 Days
+					//current.Schemes
+					//current.SchemeMap
+					current.RequireAuthenticatedSignIn = true;
+				})
+				.AddCookie(authenticationScheme: AuthenticationScheme,
+					options =>
+					{
+						options.ClaimsIssuer = "DTAT Security Framework"; // Default: null
 
-					options.ReturnUrlParameter = "ReturnUrl"; // Default: "ReturnUrl"
+						options.SlidingExpiration = true; // Default: true
+						options.ExpireTimeSpan =
+							new System.TimeSpan(hours: 0, minutes: 20, seconds: 0); // Default: 14 Days
 
-					options.LoginPath =
-						new Microsoft.AspNetCore.Http.PathString(value: "/Account/Login");
+						options.ReturnUrlParameter = "ReturnUrl"; // Default: "ReturnUrl"
 
-					options.LogoutPath =
-						new Microsoft.AspNetCore.Http.PathString(value: "/Account/Logout");
+						options.LoginPath =
+							new Microsoft.AspNetCore.Http.PathString(value: "/Account/Login");
 
-					options.AccessDeniedPath =
-						new Microsoft.AspNetCore.Http.PathString(value: "/Account/AccessDenied");
+						options.LogoutPath =
+							new Microsoft.AspNetCore.Http.PathString(value: "/Account/Logout");
 
-					var value01 = options.Cookie;
-					var value02 = options.CookieManager;
-					var value03 = options.DataProtectionProvider;
+						options.AccessDeniedPath =
+							new Microsoft.AspNetCore.Http.PathString(value: "/Account/AccessDenied");
 
-					var value04 = options.EventsType;
-					var value05 = options.SessionStore;
-					var value06 = options.TicketDataFormat;
+						var value01 = options.Cookie;
+						var value02 = options.CookieManager;
+						var value03 = options.DataProtectionProvider;
 
-					var value07 = options.ForwardForbid;
-					var value08 = options.ForwardSignIn;
-					var value09 = options.ForwardSignOut;
-					var value10 = options.ForwardChallenge;
-					var value11 = options.ForwardAuthenticate;
-					var value12 = options.ForwardDefaultSelector;
+						var value04 = options.EventsType;
+						var value05 = options.SessionStore;
+						var value06 = options.TicketDataFormat;
 
-					options.Validate();
-				});
+						var value07 = options.ForwardForbid;
+						var value08 = options.ForwardSignIn;
+						var value09 = options.ForwardSignOut;
+						var value10 = options.ForwardChallenge;
+						var value11 = options.ForwardAuthenticate;
+						var value12 = options.ForwardDefaultSelector;
+
+						options.Validate();
+					});
 			// **************************************************
 		}
 

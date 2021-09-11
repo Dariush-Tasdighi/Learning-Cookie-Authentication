@@ -111,9 +111,7 @@ namespace Applicatioin.Controllers
 				// **************************************************
 				var claimsIdentity =
 					new System.Security.Claims.ClaimsIdentity
-						(claims: claims, authenticationType:
-						Microsoft.AspNetCore.Authentication.Cookies
-						.CookieAuthenticationDefaults.AuthenticationScheme);
+					(claims: claims, authenticationType: Startup.AuthenticationScheme);
 
 				var authenticationProperties = new AuthenticationProperties
 				{
@@ -146,8 +144,7 @@ namespace Applicatioin.Controllers
 
 				// using Microsoft.AspNetCore.Authentication;
 				await HttpContext.SignInAsync
-					(scheme: Microsoft.AspNetCore.Authentication.Cookies
-					.CookieAuthenticationDefaults.AuthenticationScheme,
+					(scheme: Startup.AuthenticationScheme,
 					principal: claimsPrincipal, properties: authenticationProperties);
 				// **************************************************
 
@@ -211,8 +208,7 @@ namespace Applicatioin.Controllers
 		{
 			// using Microsoft.AspNetCore.Authentication;
 			await HttpContext.SignOutAsync
-				(scheme: Microsoft.AspNetCore.Authentication.Cookies
-				.CookieAuthenticationDefaults.AuthenticationScheme);
+				(scheme: Startup.AuthenticationScheme);
 
 			return RedirectToAction
 				(controllerName: "Account", actionName: "Login");
